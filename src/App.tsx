@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 import LogIn from "./components/LogIn";
-import Search from "./components/Search";
+import Search, { noFilter } from "./components/Search";
 import TrackList from "./components/TrackList";
+import { FilterValue, ITrack, Option } from "./interfaces";
 import { getTracksByQueryAndType } from "./services";
-import { getHash, restHash, Track } from "./utils";
+import { compare, getHash, restHash } from "./utils";
 
 const App = () => {
   const [token, setToken] = useState("");
   const [searchVal, setSearchVal] = useState("");
-  const [tracks, setTracks] = useState<Track[]>([]);
-
-  console.log(tracks);
+  const [tracks, setTracks] = useState<ITrack[]>([]);
+  const [sortAsc, setSortAsc] = useState(true);
+  const [filter, setFilter] = useState<Option>(noFilter);
 
   useEffect(() => {
     const _token = getHash.access_token;
@@ -25,8 +26,8 @@ const App = () => {
   useEffect(() => {
     if (searchVal) {
       try {
-        getTracksByQueryAndType(token, searchVal).then((tracks) =>
-          setTracks(tracks || [])
+        getTracksByQueryAndType(token, searchVal).then((data) =>
+          setTracks(data || [])
         );
       } catch (err) {
         console.log(err);
@@ -34,16 +35,49 @@ const App = () => {
     }
   }, [searchVal, token]);
 
+  let sortedAndFilteredTracks = tracks;
+  sortedAndFilteredTracks = sortedAndFilteredTracks.filter(
+    ({ duration_ms }) => {
+      console.log(filter?.value);
+      switch (filter?.value) {
+        case FilterValue.LessThen1:
+          return duration_ms < 60000;
+        case FilterValue.MoreThen1:
+          return duration_ms > 60000;
+        case FilterValue.MoreThen2:
+          return duration_ms > 60000 * 2;
+        case FilterValue.MoreThen3:
+          return duration_ms > 60000 * 3;
+        case FilterValue.None:
+        default:
+          return true;
+      }
+    }
+  );
+
+  console.log(sortedAndFilteredTracks);
+  sortedAndFilteredTracks = sortedAndFilteredTracks.sort((a, b) =>
+    compare(a.name, b.name, sortAsc)
+  );
+
   return (
     <Container>
-      {!token ? (
-        <LogIn />
-      ) : (
-        <Content>
-          <Search onSearchClick={setSearchVal} />
-          <TrackList tracks={tracks} />
-        </Content>
-      )}
+      <AppWrapper>
+        {!token ? (
+          <LogIn />
+        ) : (
+          <Content>
+            <Search
+              sortAsc={sortAsc}
+              filter={filter}
+              toggleSort={() => setSortAsc((prev) => !prev)}
+              onFilterChange={(newValue: Option) => setFilter(newValue)}
+              onSearchClick={setSearchVal}
+            />
+            <TrackList tracks={sortedAndFilteredTracks} />
+          </Content>
+        )}
+      </AppWrapper>
     </Container>
   );
 };
@@ -52,12 +86,22 @@ export default App;
 
 const Container = styled.div`
   display: flex;
-  width: 500px;
+  margin: 0 auto;
+  height: 100vh;
+  background-color: black;
+`;
+
+const AppWrapper = styled.div`
+  display: flex;
+  // width: 500px;
   margin: 0 auto;
   height: 100vh;
   justify-content: center;
+  background-color: black;
 `;
 
 const Content = styled.div`
   padding-top: 50px;
+  width: 100%;
+  margin: 0 25px;
 `;

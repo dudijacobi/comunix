@@ -1,16 +1,16 @@
-import React from "react";
 import styled from "styled-components";
-import { Track } from "../utils";
+import { ITrack } from "../interfaces";
+import Track from "./Track";
 
 interface Props {
-  tracks: Track[];
+  tracks: ITrack[];
 }
 
 const TrackList = ({ tracks }: Props) => {
   return (
     <Container>
-      {tracks.map(({ id }) => (
-        <li key={id}></li>
+      {tracks.map((track) => (
+        <Track key={track.id} track={track} />
       ))}
     </Container>
   );
@@ -19,15 +19,9 @@ const TrackList = ({ tracks }: Props) => {
 export default TrackList;
 
 const Container = styled.ul`
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  border-bottom: 1px solid gray;
-  padding-bottom: 15px;
-  margin-bottom: 15px;
-
-  label,
-  input {
-    margin-bottom: 5px;
-  }
+  list-style: none;
+  margin: 0;
+  padding: 0 2px 0 0;
+  overflow: auto;
+  height: calc(100vh - 255px);
 `;
