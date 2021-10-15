@@ -6,15 +6,13 @@ interface Props {
   tracks: ITrack[];
 }
 
-const TrackList = ({ tracks }: Props) => {
-  return (
-    <Container>
-      {tracks.map((track) => (
-        <Track key={track.id} track={track} />
-      ))}
-    </Container>
-  );
-};
+const TrackList = ({ tracks }: Props) => (
+  <Container>
+    {tracks.map((track) => (
+      <Track key={track.id} track={track} />
+    ))}
+  </Container>
+);
 
 export default TrackList;
 

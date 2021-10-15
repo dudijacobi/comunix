@@ -54,8 +54,6 @@ const App = () => {
       }
     }
   );
-
-  console.log(sortedAndFilteredTracks);
   sortedAndFilteredTracks = sortedAndFilteredTracks.sort((a, b) =>
     compare(a.name, b.name, sortAsc)
   );
