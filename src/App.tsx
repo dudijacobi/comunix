@@ -38,7 +38,6 @@ const App = () => {
   let sortedAndFilteredTracks = tracks;
   sortedAndFilteredTracks = sortedAndFilteredTracks.filter(
     ({ duration_ms }) => {
-      console.log(filter?.value);
       switch (filter?.value) {
         case FilterValue.LessThen1:
           return duration_ms < 60000;
